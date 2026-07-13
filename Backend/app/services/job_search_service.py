@@ -106,9 +106,7 @@ class JobSearchService:
                 f"JSearch request failed for city '{city}'."
             ) from exc
 
-        raw_jobs = response.json().get("data", [])
-        print("DEBUG raw_jobs type:", type(raw_jobs))
-        print("DEBUG raw_jobs sample:", raw_jobs if len(str(raw_jobs)) < 500 else str(raw_jobs)[:500])
+        raw_jobs = response.json().get("data", {}).get("jobs", [])
         return [self._normalize_job(item) for item in raw_jobs if item.get("job_id")]
 
     def _normalize_job(self, item: dict[str, Any]) -> JobPosting:
