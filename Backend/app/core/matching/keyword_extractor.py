@@ -77,6 +77,56 @@ SKILL_SEEDS: Set[str] = {
     "sqlalchemy", "prisma", "typeorm", "sequelize", "hibernate",
 }
 
+# Curated multi-word skill phrases matched as whole units, not arbitrary bigrams.
+PHRASE_SEEDS: Set[str] = {
+    "machine learning",
+    "deep learning",
+    "data science",
+    "data pipeline",
+    "data pipelines",
+    "rest api",
+    "rest apis",
+    "computer vision",
+    "natural language processing",
+    "version control",
+    "unit testing",
+    "ci cd",
+    "cloud computing",
+    "object oriented",
+    "cross functional",
+    "problem solving",
+    "feature engineering",
+    "model training",
+    "model deployment",
+    "data preprocessing",
+    "big data",
+    "artificial intelligence",
+    "software engineering",
+    "web development",
+    "mobile development",
+    "full stack",
+    "backend development",
+    "frontend development",
+    "distributed systems",
+    "system design",
+    "data analysis",
+    "data engineering",
+    "business intelligence",
+    "quality assurance",
+    "test automation",
+    "continuous integration",
+    "continuous deployment",
+    "agile development",
+    "project management",
+    "product management",
+    "stakeholder management",
+    "time series",
+    "neural network",
+    "neural networks",
+    "large language model",
+    "large language models",
+}
+
 # Tech marker characters that indicate a token is likely a technology name, not plain English.
 TECH_MARKERS = ("+", "#", ".", "-", "/")
 
@@ -122,18 +172,21 @@ def _extract_skill_tokens(tokens: Iterable[str]) -> Set[str]:
 
 
 def _extract_phrases(text: str) -> Set[str]:
-    """Capture requirement phrases and bigrams that often denote skills."""
+    """Capture requirement phrases and curated multi-word skill phrases."""
     phrases: Set[str] = set()
     for pattern in REQUIREMENT_PATTERNS:
         for match in pattern.findall(text):
             phrases.add(match.lower().strip())
-    tokens = _tokenize(_normalize_text(text))
-    for index in range(len(tokens) - 1):
-        first, second = tokens[index], tokens[index + 1]
-        if first in STOPWORDS or second in STOPWORDS:
-            continue
-        if first in SKILL_SEEDS or second in SKILL_SEEDS:
-            phrases.add(f"{first} {second}")
+
+    normalized = _normalize_text(text)
+    cleaned_tokens = [token.strip(".,") for token in normalized.split() if token.strip(".,")]
+    phrase_search_text = " ".join(cleaned_tokens)
+
+    for phrase in PHRASE_SEEDS:
+        boundary_pattern = rf"(?<!\w){re.escape(phrase)}(?!\w)"
+        if re.search(boundary_pattern, phrase_search_text):
+            phrases.add(phrase)
+
     return phrases
 
 
