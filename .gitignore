@@ -1,0 +1,72 @@
+# =============================================================================
+# JobMatch monorepo - root .gitignore
+# Covers Backend (Python/FastAPI), Mobile (Flutter), and Web (React)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# OS and editor
+# -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# -----------------------------------------------------------------------------
+# Environment and secrets (keep .env.example tracked)
+# -----------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# -----------------------------------------------------------------------------
+# Logs and temp files
+# -----------------------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+
+# =============================================================================
+# Backend - Python / FastAPI
+# =============================================================================
+Backend/.venv/
+Backend/venv/
+Backend/env/
+Backend/.env
+Backend/.pytest_cache/
+Backend/.mypy_cache/
+Backend/.ruff_cache/
+Backend/.coverage
+Backend/htmlcov/
+Backend/dist/
+Backend/build/
+Backend/*.egg-info/
+Backend/.eggs/
+
+Backend/**/__pycache__/
+Backend/**/*.py[cod]
+Backend/**/*$py.class
+Backend/**/*.so
+
+# ML model caches downloaded at runtime
+Backend/.cache/
+.cache/
+
+# Uploaded files during local development
+Backend/uploads/
+Backend/media/
+
+
+node_modules/
+coverage/

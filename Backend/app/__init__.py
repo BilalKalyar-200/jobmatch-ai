@@ -1,0 +1,1 @@
+"""JobMatch FastAPI application package."""
