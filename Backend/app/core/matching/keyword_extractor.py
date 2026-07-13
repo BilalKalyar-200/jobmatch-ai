@@ -3,7 +3,7 @@
 import re
 from typing import Iterable, Set
 
-# Common English stopwords kept small on purpose for predictable behavior.
+# Common English stopwords and job-posting filler kept out of skill detection.
 STOPWORDS: Set[str] = {
     "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "has", "have",
     "in", "is", "it", "of", "on", "or", "that", "the", "to", "was", "will", "with",
@@ -12,24 +12,73 @@ STOPWORDS: Set[str] = {
     "including", "include", "includes", "required", "requirements", "requirement",
     "experience", "years", "year", "work", "working", "role", "position", "job",
     "team", "company", "using", "use", "used", "strong", "excellent", "good",
+    "seeking", "ideal", "looking", "skilled", "understanding", "valued", "critical",
+    "offers", "monthly", "salary", "competitive", "closely", "ensuring", "resolving",
+    "promptly", "previous", "more", "while", "expected", "candidate", "candidates",
+    "join", "help", "build", "support", "drive", "deliver", "ensure", "provide",
+    "ability", "responsible", "responsibilities", "duties", "tasks", "environment",
+    "opportunity", "opportunities", "benefits", "culture", "dynamic", "fast",
+    "paced", "global", "leading", "innovative", "passionate", "motivated",
+    "detail", "oriented", "self", "starter", "highly", "well", "both", "within",
+    "across", "between", "through", "during", "after", "before", "each", "every",
+    "other", "another", "same", "different", "new", "existing", "current", "future",
+    "based", "related", "relevant", "appropriate", "similar", "various", "multiple",
+    "several", "primarily", "mainly", "also", "plus", "including", "especially",
 }
 
 # Curated skill seeds improve overlap detection beyond generic tokenization.
 SKILL_SEEDS: Set[str] = {
-    "python", "java", "javascript", "typescript", "react", "angular", "vue", "node",
-    "nodejs", "fastapi", "django", "flask", "spring", "kotlin", "swift", "flutter",
-    "dart", "golang", "rust", "csharp", "dotnet", "sql", "postgresql", "mysql",
-    "mongodb", "redis", "docker", "kubernetes", "aws", "azure", "gcp", "terraform",
-    "ansible", "jenkins", "git", "github", "gitlab", "ci", "cd", "agile", "scrum",
-    "rest", "graphql", "api", "microservices", "machine", "learning", "deep",
-    "tensorflow", "pytorch", "pandas", "numpy", "scikit", "nlp", "llm", "openai",
-    "html", "css", "sass", "tailwind", "bootstrap", "linux", "unix", "bash",
-    "powershell", "excel", "tableau", "power", "bi", "salesforce", "sap", "oracle",
-    "jira", "confluence", "figma", "photoshop", "seo", "sem", "marketing", "sales",
-    "communication", "leadership", "management", "analytics", "data", "science",
-    "statistics", "testing", "qa", "selenium", "cypress", "jest", "pytest", "junit",
-    "security", "oauth", "jwt", "encryption", "blockchain", "solidity", "ethereum",
+    # Programming languages
+    "python", "java", "javascript", "typescript", "ruby", "php", "perl", "scala",
+    "kotlin", "swift", "dart", "golang", "rust", "csharp", "dotnet", "r", "matlab",
+    "lua", "elixir", "clojure", "haskell", "objective", "assembly", "cobol", "fortran",
+    "delphi", "vba", "groovy", "julia", "erlang", "fsharp", "solidity",
+    # Web frameworks and libraries
+    "react", "angular", "vue", "svelte", "nextjs", "nuxt", "node", "nodejs",
+    "express", "nestjs", "fastapi", "django", "flask", "spring", "rails", "laravel",
+    "symfony", "asp.net", "blazor", "hibernate", "jquery", "redux", "webpack",
+    "vite", "babel", "tailwind", "bootstrap", "sass", "html", "css", "graphql",
+    "rest", "grpc", "websocket", "json", "xml", "yaml", "openapi", "swagger",
+    # Mobile and desktop
+    "flutter", "android", "ios", "xamarin", "reactnative", "electron",
+    # Data, ML, and AI
+    "machine", "learning", "deep", "tensorflow", "pytorch", "keras", "pandas",
+    "numpy", "scikit", "scipy", "spark", "hadoop", "kafka", "airflow", "dbt",
+    "nlp", "llm", "openai", "langchain", "huggingface", "opencv", "mlops",
+    "statistics", "analytics", "data", "science", "etl", "elt", "tableau",
+    "power", "bi", "looker", "snowflake", "databricks", "bigquery", "redshift",
+    # Databases and storage
+    "sql", "postgresql", "mysql", "mariadb", "sqlite", "mongodb", "redis",
+    "dynamodb", "cassandra", "elasticsearch", "neo4j", "firebase", "supabase",
+    "oracle", "sqlserver", "influxdb", "memcached", "rabbitmq", "celery",
+    # Cloud and DevOps
+    "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "ansible",
+    "jenkins", "gitlab", "github", "git", "ci", "cd", "devops", "helm", "argo",
+    "prometheus", "grafana", "datadog", "splunk", "nginx", "apache", "linux",
+    "unix", "bash", "powershell", "cloudformation", "lambda", "ec2", "s3", "ecs",
+    "eks", "gke", "aks", "vpc", "iam", "circleci", "travis", "sonarqube",
+    # Testing and QA
+    "testing", "qa", "selenium", "cypress", "playwright", "jest", "pytest",
+    "junit", "testng", "mocha", "chai", "vitest", "postman", "insomnia",
+    # Security
+    "security", "oauth", "jwt", "encryption", "blockchain", "ethereum", "cryptography",
+    # Business tools and platforms
+    "jira", "confluence", "figma", "photoshop", "salesforce", "sap", "servicenow",
+    "excel", "sharepoint", "slack", "notion", "microservices", "api",
+    # Methodologies
+    "agile", "scrum", "kanban", "devsecops", "tdd", "bdd",
+    # Marketing and business skills
+    "seo", "sem", "marketing", "sales", "communication", "leadership", "management",
+    "collaboration", "teamwork", "mentoring", "negotiation", "presentation",
+    "stakeholder", "problem", "solving", "analysis", "research", "planning",
+    # Build and package tools
+    "npm", "yarn", "pnpm", "maven", "gradle", "pip", "poetry", "conda",
+    # ORMs and data access
+    "sqlalchemy", "prisma", "typeorm", "sequelize", "hibernate",
 }
+
+# Tech marker characters that indicate a token is likely a technology name, not plain English.
+TECH_MARKERS = ("+", "#", ".", "-", "/")
 
 # Requirement phrases often appear verbatim in postings.
 REQUIREMENT_PATTERNS: list[re.Pattern[str]] = [
@@ -64,9 +113,10 @@ def _extract_skill_tokens(tokens: Iterable[str]) -> Set[str]:
         if cleaned in SKILL_SEEDS:
             found.add(cleaned)
             continue
-        # Accept alphanumeric tokens with tech markers such as c++, node.js, c#.
+        # Accept tokens with tech markers such as c++, node.js, c#, ci/cd.
+        # Plain English words must not pass through just because they are long enough.
         if re.fullmatch(r"[a-z0-9+#./-]{2,}", cleaned):
-            if any(marker in cleaned for marker in ("+", "#", ".", "-")) or len(cleaned) >= 3:
+            if any(marker in cleaned for marker in TECH_MARKERS):
                 found.add(cleaned)
     return found
 
