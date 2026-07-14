@@ -1,5 +1,7 @@
 """Saved jobs and search history business logic."""
 
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from app.exceptions import NotFoundError
@@ -51,6 +53,12 @@ class SavedJobService:
         records = self.search_history_repo.list_for_user(user.id)
         searches = [SearchHistoryItem.model_validate(record) for record in records]
         return SearchHistoryListResponse(total=len(searches), searches=searches)
+
+    def delete_search_history(self, user: User, search_id: UUID) -> None:
+        entry = self.search_history_repo.get_by_id_for_user(user.id, search_id)
+        if entry is None:
+            raise NotFoundError("Search history entry not found.")
+        self.search_history_repo.delete(entry)
 
     def _to_saved_job_response(self, record) -> SavedJobResponse:
         job_payload = record.job_data

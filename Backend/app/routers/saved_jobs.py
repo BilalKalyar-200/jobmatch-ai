@@ -1,5 +1,7 @@
 """Saved jobs and search history routes."""
 
+from uuid import UUID
+
 from fastapi import APIRouter, status
 
 from app.dependencies import CurrentUser, DbSession
@@ -45,3 +47,13 @@ def list_search_history(
 ) -> SearchHistoryListResponse:
     """List the user's past job searches."""
     return SavedJobService(db).list_search_history(current_user)
+
+
+@router.delete("/searches/{search_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_search_history(
+    search_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> None:
+    """Delete a single search history entry for the authenticated user."""
+    SavedJobService(db).delete_search_history(current_user, search_id)

@@ -1,6 +1,6 @@
 """Search history persistence."""
 
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -26,6 +26,16 @@ class SearchHistoryRepository:
         self.db.refresh(entry)
         return entry
 
+    def get_by_id_for_user(self, user_id: UUID, search_id: UUID) -> Optional[SearchHistory]:
+        return (
+            self.db.query(SearchHistory)
+            .filter(
+                SearchHistory.id == search_id,
+                SearchHistory.user_id == user_id,
+            )
+            .first()
+        )
+
     def list_for_user(self, user_id: UUID, limit: int = 50) -> List[SearchHistory]:
         return (
             self.db.query(SearchHistory)
@@ -34,3 +44,7 @@ class SearchHistoryRepository:
             .limit(limit)
             .all()
         )
+
+    def delete(self, entry: SearchHistory) -> None:
+        self.db.delete(entry)
+        self.db.commit()
