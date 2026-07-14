@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-900: #1e3a8a;
+  --color-accent: #51a2ff;
+  --color-surface: #f4f6fb;
+  --color-surface-elevated: #ffffff;
+  --color-surface-dark: #09090f;
+  --color-card-dark: #12121a;
+  --color-border-dark: #1e1e2a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-surface text-slate-900 antialiased transition-colors duration-300;
+}
+
+.dark body {
+  @apply bg-surface-dark text-slate-100;
+}
+
+/* Shared interactive polish */
+.card-hover {
+  @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg;
+}
+
+.btn-lift {
+  @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0;
+}
+
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+}
+
+.dark .focus-ring {
+  @apply focus-visible:ring-accent focus-visible:ring-offset-surface-dark;
+}

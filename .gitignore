@@ -70,3 +70,27 @@ Backend/media/
 
 node_modules/
 coverage/
+
+Web/node_modules/
+Web/dist/
+Web/build/
+Web/.next/
+Web/out/
+Web/.nuxt/
+Web/.output/
+Web/.parcel-cache/
+Web/.turbo/
+Web/.vercel/
+Web/.netlify/
+
+Web/npm-debug.log*
+Web/yarn-debug.log*
+Web/yarn-error.log*
+Web/pnpm-debug.log*
+Web/.pnpm-store/
+
+Web/coverage/
+Web/*.tsbuildinfo
+
+# Vite
+Web/.vite/
