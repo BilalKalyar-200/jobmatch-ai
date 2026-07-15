@@ -1,11 +1,4 @@
-# =============================================================================
-# JobMatch monorepo - root .gitignore
-# Covers Backend (Python/FastAPI), Mobile (Flutter), and Web (React)
-# =============================================================================
 
-# -----------------------------------------------------------------------------
-# OS and editor
-# -----------------------------------------------------------------------------
 .DS_Store
 Thumbs.db
 Desktop.ini
@@ -21,25 +14,18 @@ Desktop.ini
 !.vscode/launch.json
 !.vscode/tasks.json
 
-# -----------------------------------------------------------------------------
-# Environment and secrets (keep .env.example tracked)
-# -----------------------------------------------------------------------------
 .env
 .env.local
 .env.*.local
 !.env.example
 
-# -----------------------------------------------------------------------------
-# Logs and temp files
-# -----------------------------------------------------------------------------
+
 *.log
 logs/
 tmp/
 temp/
 
-# =============================================================================
-# Backend - Python / FastAPI
-# =============================================================================
+
 Backend/.venv/
 Backend/venv/
 Backend/env/
@@ -71,6 +57,8 @@ Backend/media/
 node_modules/
 coverage/
 
+
+# WEB
 Web/node_modules/
 Web/dist/
 Web/build/
@@ -94,3 +82,38 @@ Web/*.tsbuildinfo
 
 # Vite
 Web/.vite/
+
+
+# APP
+Mobile/.dart_tool/
+Mobile/.flutter-plugins
+Mobile/.flutter-plugins-dependencies
+Mobile/.packages
+Mobile/.pub-cache/
+Mobile/.pub/
+Mobile/build/
+Mobile/coverage/
+Mobile/**/doc/api/
+
+# Android
+Mobile/**/android/.gradle/
+Mobile/**/android/captures/
+Mobile/**/android/local.properties
+Mobile/**/android/**/GeneratedPluginRegistrant.java
+Mobile/**/android/key.properties
+Mobile/**/*.jks
+Mobile/**/*.keystore
+
+# iOS
+Mobile/**/ios/Pods/
+Mobile/**/ios/.symlinks/
+Mobile/**/ios/Flutter/Flutter.framework
+Mobile/**/ios/Flutter/Flutter.podspec
+Mobile/**/ios/Flutter/Generated.xcconfig
+Mobile/**/ios/Flutter/ephemeral/
+Mobile/**/ios/ServiceDefinitions.json
+Mobile/**/ios/Runner/GeneratedPluginRegistrant.*
+
+# macOS desktop Flutter builds
+Mobile/**/macos/Flutter/ephemeral/
+Mobile/**/macos/Pods/
