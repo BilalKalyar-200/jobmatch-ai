@@ -29,27 +29,32 @@ class ResumeService:
         self.resume_repo = ResumeRepository(db)
 
     async def upload_resume(self, user: User, file: UploadFile) -> ResumeUploadResponse:
-        filename = file.filename or "resume"
-        extension = self._validate_file(filename, file.content_type)
-        content = await file.read()
+            filename = file.filename or "resume"
+            extension = self._validate_file(filename, file.content_type)
 
-        if len(content) > settings.max_resume_size_bytes:
-            raise ValidationError(
-                f"Resume exceeds maximum size of {settings.max_resume_size_mb} MB."
+            # Read at most one byte more than the allowed size. This avoids
+            # buffering an unbounded upload fully into memory before the size
+            # check below can reject it, protecting against large file abuse.
+            max_bytes = settings.max_resume_size_bytes
+            content = await file.read(max_bytes + 1)
+
+            if len(content) > max_bytes:
+                raise ValidationError(
+                    f"Resume exceeds maximum size of {settings.max_resume_size_mb} MB."
+                )
+            if len(content) == 0:
+                raise ValidationError("Uploaded file is empty.")
+
+            parsed_text = self._extract_text(content, extension)
+            if not parsed_text.strip():
+                raise ValidationError("Could not extract text from the uploaded resume.")
+
+            resume = self.resume_repo.upsert_for_user(
+                user_id=user.id,
+                filename=filename,
+                parsed_text=parsed_text,
             )
-        if len(content) == 0:
-            raise ValidationError("Uploaded file is empty.")
-
-        parsed_text = self._extract_text(content, extension)
-        if not parsed_text.strip():
-            raise ValidationError("Could not extract text from the uploaded resume.")
-
-        resume = self.resume_repo.upsert_for_user(
-            user_id=user.id,
-            filename=filename,
-            parsed_text=parsed_text,
-        )
-        return ResumeUploadResponse(resume=self._to_response(resume))
+            return ResumeUploadResponse(resume=self._to_response(resume))
 
     def get_latest_resume(self, user: User) -> ResumeResponse:
         resume = self.resume_repo.get_latest_for_user(user.id)

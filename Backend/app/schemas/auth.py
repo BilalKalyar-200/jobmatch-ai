@@ -32,7 +32,7 @@ class LoginRequest(BaseModel):
 class RefreshRequest(BaseModel):
     """Payload for exchanging a refresh token for new tokens."""
 
-    refresh_token: str = Field(min_length=10)
+    refresh_token: str = Field(min_length=10,max_length=2000)
 
 
 class TokenResponse(BaseModel):

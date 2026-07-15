@@ -56,7 +56,7 @@ class JobMatchRequest(BaseModel):
     """Score a stored resume against a job by id or raw description."""
 
     job_id: Optional[str] = Field(default=None, min_length=1)
-    job_description: Optional[str] = Field(default=None, min_length=20)
+    job_description: Optional[str] = Field(default=None, min_length=20, max_length=20000)
 
     @field_validator("job_description")
     @classmethod

@@ -1,7 +1,8 @@
 """Authentication routes."""
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 
+from app.core.rate_limit import limiter
 from app.dependencies import DbSession
 from app.schemas.auth import (
     LoginRequest,
@@ -16,13 +17,15 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def signup(payload: SignupRequest, db: DbSession) -> TokenResponse:
+@limiter.limit("3/minute")
+def signup(request: Request, payload: SignupRequest, db: DbSession) -> TokenResponse:
     """Register a new user and return JWT tokens."""
     return AuthService(db).signup(payload)
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: DbSession) -> TokenResponse:
+@limiter.limit("5/minute")
+def login(request: Request, payload: LoginRequest, db: DbSession) -> TokenResponse:
     """Authenticate with email and password."""
     return AuthService(db).login(payload)
 

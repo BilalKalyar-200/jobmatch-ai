@@ -5,6 +5,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError as PydanticValidationError
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
+from app.core.rate_limit import limiter
 
 from app.config import get_settings
 from app.exceptions import AppError
@@ -30,6 +34,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.state.limiter = limiter
+    app.add_middleware(SlowAPIMiddleware)
 
     app.include_router(auth.router, prefix=settings.api_v1_prefix)
     app.include_router(users.router, prefix=settings.api_v1_prefix)
@@ -112,14 +118,25 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "details": _sanitize_errors(exc.errors()),
             },
         )
-
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(_: Request, exc: RateLimitExceeded) -> JSONResponse:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "Too many requests. Please try again shortly."},
+        )
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(_: Request, exc: Exception) -> JSONResponse:
         # Log internally in production. Never expose raw tracebacks to clients.
         if settings.debug:
+            detail = str(exc)
+            # Belt and suspenders check. This should never legitimately
+            # happen, but guarantees the JWT secret can never leak through
+            # an unrelated exception message.
+            if settings.jwt_secret_key in detail:
+                detail = "[redacted]"
             return JSONResponse(
                 status_code=500,
-                content={"error": "Internal server error.", "details": str(exc)},
+                content={"error": "Internal server error.", "details": detail},
             )
         return JSONResponse(
             status_code=500,
