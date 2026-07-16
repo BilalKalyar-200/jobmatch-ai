@@ -14,6 +14,7 @@ import '../../widgets/app_card.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/resume_preview_text.dart';
 import '../../widgets/score_ring.dart';
+import '../../widgets/gradient_button.dart';
 
 class ResumeScreen extends ConsumerStatefulWidget {
   const ResumeScreen({super.key, this.matchResult, this.jobTitle});
@@ -147,16 +148,11 @@ class _ResumeScreenState extends ConsumerState<ResumeScreen> {
             'Upload a PDF or DOCX resume, then score it against a job from the job detail screen.',
           ),
           const SizedBox(height: 20),
-          ElevatedButton.icon(
+          GradientButton(
+            label: 'Pick resume file',
+            icon: Icons.upload_file,
+            loading: _uploading,
             onPressed: _uploading ? null : _pickAndUpload,
-            icon: const Icon(Icons.upload_file),
-            label: _uploading
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Pick resume file'),
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),

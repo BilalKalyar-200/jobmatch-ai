@@ -15,6 +15,7 @@ import '../../widgets/job_card.dart';
 import '../profile/profile_screen.dart';
 import '../resume/resume_screen.dart';
 import '../saved/saved_screen.dart';
+import '../../widgets/gradient_button.dart';
 
 class HomeShell extends StatelessWidget {
   const HomeShell({super.key, required this.child});
@@ -278,9 +279,9 @@ class _JobsTabState extends ConsumerState<JobsTab> {
                 title: 'Ready to find your next role',
                 description:
                     'Your preferences are set. Run a search to see live job postings matched to your niche and cities.',
-                action: ElevatedButton(
+                action: GradientButton(
+                  label: 'Search jobs now',
                   onPressed: _runSearch,
-                  child: const Text('Search jobs now'),
                 ),
               ),
             if (!_loading && _hasSearched && (_results?.total ?? 0) == 0)

@@ -6,6 +6,7 @@ import '../../core/api/api_client.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/password_text_field.dart';
+import '../../widgets/gradient_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -34,15 +35,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      await ref.read(authProvider.notifier).login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      await ref
+          .read(authProvider.notifier)
+          .login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
       if (mounted) {
         context.go('/jobs');
       }
     } catch (error) {
-      setState(() => _error = readableErrorMessage(error, fallback: 'Login failed.'));
+      setState(
+        () => _error = readableErrorMessage(error, fallback: 'Login failed.'),
+      );
     } finally {
       if (mounted) {
         setState(() => _loading = false);
@@ -67,10 +72,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       Text(
                         'Welcome back',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text('Sign in to continue your job search.', style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        'Sign in to continue your job search.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _emailController,
@@ -90,16 +99,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ErrorBanner(message: _error!),
                       ],
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _loading ? null : _submit,
-                        child: _loading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text('Sign in'),
-                      ),
+                      if (_loading)
+                        const Center(
+                          child: SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      else
+                        GradientButton(
+                          label: 'Sign in',
+                          loading: _loading,
+                          onPressed: _loading ? null : _submit,
+                        ),
                       const SizedBox(height: 12),
                       TextButton(
                         onPressed: () => context.go('/signup'),

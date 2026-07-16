@@ -6,6 +6,7 @@ import '../../core/api/api_client.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/password_text_field.dart';
+import '../../widgets/gradient_button.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -36,16 +37,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     });
 
     try {
-      await ref.read(authProvider.notifier).signup(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        name: _nameController.text.trim(),
-      );
+      await ref
+          .read(authProvider.notifier)
+          .signup(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            name: _nameController.text.trim(),
+          );
       if (mounted) {
         context.go('/preferences');
       }
     } catch (error) {
-      setState(() => _error = readableErrorMessage(error, fallback: 'Signup failed.'));
+      setState(
+        () => _error = readableErrorMessage(error, fallback: 'Signup failed.'),
+      );
     } finally {
       if (mounted) {
         setState(() => _loading = false);
@@ -70,10 +75,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     children: [
                       Text(
                         'Create account',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text('Start matching jobs to your resume.', style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        'Start matching jobs to your resume.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _nameController,
@@ -99,15 +108,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ErrorBanner(message: _error!),
                       ],
                       const SizedBox(height: 20),
-                      ElevatedButton(
+                      GradientButton(
+                        label: 'Sign up',
+                        loading: _loading,
                         onPressed: _loading ? null : _submit,
-                        child: _loading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text('Sign up'),
                       ),
                       const SizedBox(height: 12),
                       TextButton(

@@ -41,14 +41,14 @@ class _AppCardState extends State<AppCard> {
             ? const []
             : [
                 BoxShadow(
-                  color: AppColors.slate900.withValues(alpha: 0.06),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
+                  color: AppColors.slate900.withValues(alpha: 0.10),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12),
                 ),
                 BoxShadow(
-                  color: AppColors.slate900.withValues(alpha: 0.03),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
+                  color: AppColors.slate900.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
                 ),
               ],
       ),
